@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  voice-to-text:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - SARVAM_API_KEY=${SARVAM_API_KEY}
+      - SECRET_PIN=${SECRET_PIN}
+    volumes:
+      - ./uploads:/app/uploads
+      - ./chunks:/app/chunks
+    restart: unless-stopped

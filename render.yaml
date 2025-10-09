@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: voice-to-text
+    env: docker
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: SARVAM_API_KEY
+        sync: false
+      - key: SECRET_PIN
+        value: 1234
+    healthCheckPath: /health
