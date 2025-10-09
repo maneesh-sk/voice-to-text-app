@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="te">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>వాయిస్ టు టెక్స్ట్ - Voice to Text</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans Telugu', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .instructions {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .instructions h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .instructions ol {
+            color: #666;
+            line-height: 1.6;
+            padding-left: 20px;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .pin-section {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .pin-input {
+            font-size: 1.5rem;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            width: 200px;
+            text-align: center;
+            margin: 10px;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 20px 30px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-height: 80px;
+            min-width: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745, #1e7e34);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #ffc107, #e0a800);
+            color: #212529;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .file-upload {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-label {
+            display: inline-block;
+            padding: 20px 30px;
+            background: linear-gradient(135deg, #17a2b8, #138496);
+            color: white;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            min-width: 200px;
+        }
+
+        .file-label:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .audio-player {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .audio-player audio {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .status {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin: 20px 0;
+            border-radius: 10px;
+        }
+
+        .status.recording {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+
+        .status.processing {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 2px solid #bee5eb;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+
+        .transcript-section {
+            margin-top: 30px;
+        }
+
+        .transcript-text {
+            width: 100%;
+            min-height: 200px;
+            padding: 20px;
+            border: 2px solid #ddd;
+            border-radius: 15px;
+            font-size: 1.3rem;
+            font-family: 'Noto Sans Telugu', Arial, sans-serif;
+            line-height: 1.6;
+            resize: vertical;
+            background: #f8f9fa;
+        }
+
+        .transcript-actions {
+            margin-top: 15px;
+            text-align: center;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .recording-indicator {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background: #dc3545;
+            border-radius: 50%;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .btn {
+                min-width: 120px;
+                padding: 15px 20px;
+                font-size: 1rem;
+            }
+            
+            .button-group {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .pin-input {
+                width: 150px;
+                font-size: 1.2rem;
+            }
+            
+            .transcript-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .transcript-actions .btn {
+                width: 100%;
+                max-width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎤 వాయిస్ టు టెక్స్ట్</h1>
+            <p>Voice to Text Converter</p>
+        </div>
+
+        <div class="instructions">
+            <h3>📋 ఎలా వాడాలి / How to Use:</h3>
+            <ol>
+                <li>PIN నమోదు చేయండి / Enter PIN</li>
+                <li>రికార్డ్ చేయండి లేదా ఆడియో ఫైల్ అప్‌లోడ్ చేయండి / Record or upload audio</li>
+                <li>ట్రాన్‌స్క్రిప్ట్ బటన్ నొక్కండి / Click transcribe button</li>
+                <li>ఫలితాన్ని సేవ్ చేయండి / Save the result</li>
+            </ol>
+        </div>
+
+        <div class="main-content">
+            <div class="pin-section">
+                <label for="pinInput">🔐 PIN:</label>
+                <input type="password" id="pinInput" class="pin-input" placeholder="1234" maxlength="10">
+            </div>
+
+            <div class="controls">
+                <div class="button-group">
+                    <button id="recordBtn" class="btn btn-primary">
+                        🎤 రికార్డ్ / Record
+                    </button>
+                    <button id="stopBtn" class="btn btn-danger" disabled>
+                        ⏹️ స్టాప్ / Stop
+                    </button>
+                </div>
+
+                <div class="button-group">
+                    <button id="transcribeBtn" class="btn btn-success" disabled>
+                        📝 ట్రాన్‌స్క్రిప్ట్ / Transcribe
+                    </button>
+                </div>
+
+                <div class="file-upload">
+                    <input type="file" id="fileInput" class="file-input" accept="audio/*">
+                    <label for="fileInput" class="file-label">
+                        📁 Upload Audio File
+                    </label>
+                </div>
+            </div>
+
+            <div id="status" class="status hidden"></div>
+
+            <div id="audioPlayer" class="audio-player hidden">
+                <audio controls></audio>
+            </div>
+
+            <div class="transcript-section">
+                <label for="transcriptText">📄 ట్రాన్‌స్క్రిప్ట్ / Transcript:</label>
+                <textarea id="transcriptText" class="transcript-text" placeholder="ఇక్కడ ట్రాన్‌స్క్రిప్ట్ కనిపిస్తుంది... / Transcript will appear here..."></textarea>
+            <div class="transcript-actions">
+                <button id="copyBtn" class="btn btn-primary" disabled>
+                    📋 కాపీ / Copy Text
+                </button>
+                <button id="saveBtn" class="btn btn-warning" disabled>
+                    💾 సేవ్ / Save as TXT
+                </button>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class VoiceToTextApp {
+            constructor() {
+                this.mediaRecorder = null;
+                this.audioChunks = [];
+                this.audioBlob = null;
+                this.isRecording = false;
+                
+                this.initializeElements();
+                this.attachEventListeners();
+            }
+
+            initializeElements() {
+                this.pinInput = document.getElementById('pinInput');
+                this.recordBtn = document.getElementById('recordBtn');
+                this.stopBtn = document.getElementById('stopBtn');
+                this.fileInput = document.getElementById('fileInput');
+                this.transcribeBtn = document.getElementById('transcribeBtn');
+                this.status = document.getElementById('status');
+                this.audioPlayer = document.getElementById('audioPlayer');
+            this.audioElement = this.audioPlayer.querySelector('audio');
+            this.transcriptText = document.getElementById('transcriptText');
+            this.copyBtn = document.getElementById('copyBtn');
+            this.saveBtn = document.getElementById('saveBtn');
+            }
+
+            attachEventListeners() {
+                this.recordBtn.addEventListener('click', () => this.startRecording());
+                this.stopBtn.addEventListener('click', () => this.stopRecording());
+                this.fileInput.addEventListener('change', (e) => this.handleFileUpload(e));
+                this.transcribeBtn.addEventListener('click', () => this.transcribeAudio());
+                this.copyBtn.addEventListener('click', () => this.copyTranscript());
+                this.saveBtn.addEventListener('click', () => this.saveTranscript());
+            }
+
+            async startRecording() {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    this.mediaRecorder = new MediaRecorder(stream);
+                    this.audioChunks = [];
+
+                    this.mediaRecorder.ondataavailable = (event) => {
+                        this.audioChunks.push(event.data);
+                    };
+
+                    this.mediaRecorder.onstop = () => {
+                        this.audioBlob = new Blob(this.audioChunks, { type: 'audio/webm' });
+                        this.audioElement.src = URL.createObjectURL(this.audioBlob);
+                        this.audioPlayer.classList.remove('hidden');
+                        this.transcribeBtn.disabled = false;
+                        this.showStatus('Recording completed! Ready to transcribe.', 'success');
+                    };
+
+                    this.mediaRecorder.start();
+                    this.isRecording = true;
+                    this.recordBtn.disabled = true;
+                    this.stopBtn.disabled = false;
+                    this.showStatus('Recording...', 'recording');
+                } catch (error) {
+                    this.showStatus('Error accessing microphone: ' + error.message, 'error');
+                }
+            }
+
+            stopRecording() {
+                if (this.mediaRecorder && this.isRecording) {
+                    this.mediaRecorder.stop();
+                    this.mediaRecorder.stream.getTracks().forEach(track => track.stop());
+                    this.isRecording = false;
+                    this.recordBtn.disabled = false;
+                    this.stopBtn.disabled = true;
+                }
+            }
+
+            handleFileUpload(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    this.audioBlob = file;
+                    this.audioElement.src = URL.createObjectURL(file);
+                    this.audioPlayer.classList.remove('hidden');
+                    this.transcribeBtn.disabled = false;
+                    this.showStatus('Audio file loaded! Ready to transcribe.', 'success');
+                }
+            }
+
+            async transcribeAudio() {
+                if (!this.audioBlob) {
+                    this.showStatus('No audio to transcribe!', 'error');
+                    return;
+                }
+
+                const pin = this.pinInput.value.trim();
+                if (!pin) {
+                    this.showStatus('Please enter PIN!', 'error');
+                    return;
+                }
+
+                this.showStatus('Processing... Please wait.', 'processing');
+                this.transcribeBtn.disabled = true;
+
+                try {
+                    const formData = new FormData();
+                    formData.append('audio', this.audioBlob, 'audio.webm');
+                    formData.append('pin', pin);
+
+                    const response = await fetch('/transcribe', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        this.transcriptText.value = result.transcript;
+                        this.copyBtn.disabled = false;
+                        this.saveBtn.disabled = false;
+                        this.showStatus('Transcription completed successfully!', 'success');
+                        this.transcriptText.scrollIntoView({ behavior: 'smooth' });
+                    } else {
+                        this.showStatus('Error: ' + result.error, 'error');
+                    }
+                } catch (error) {
+                    this.showStatus('Network error: ' + error.message, 'error');
+                } finally {
+                    this.transcribeBtn.disabled = false;
+                }
+            }
+
+            copyTranscript() {
+                const transcript = this.transcriptText.value;
+                if (!transcript.trim()) {
+                    this.showStatus('No transcript to copy!', 'error');
+                    return;
+                }
+
+                // Select the text in the textarea
+                this.transcriptText.select();
+                this.transcriptText.setSelectionRange(0, 99999); // For mobile devices
+
+                // Copy to clipboard
+                try {
+                    document.execCommand('copy');
+                    this.showStatus('Transcript copied to clipboard!', 'success');
+                } catch (err) {
+                    // Fallback for modern browsers
+                    navigator.clipboard.writeText(transcript).then(() => {
+                        this.showStatus('Transcript copied to clipboard!', 'success');
+                    }).catch(() => {
+                        this.showStatus('Failed to copy transcript', 'error');
+                    });
+                }
+            }
+
+            saveTranscript() {
+                const transcript = this.transcriptText.value;
+                if (!transcript.trim()) {
+                    this.showStatus('No transcript to save!', 'error');
+                    return;
+                }
+
+                const blob = new Blob([transcript], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `transcript_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                this.showStatus('Transcript saved successfully!', 'success');
+            }
+
+            showStatus(message, type) {
+                this.status.textContent = message;
+                this.status.className = `status ${type}`;
+                this.status.classList.remove('hidden');
+                
+                if (type === 'recording') {
+                    this.status.innerHTML = `<span class="recording-indicator"></span> ${message}`;
+                } else if (type === 'processing') {
+                    this.status.innerHTML = `<span class="loading-spinner"></span> ${message}`;
+                }
+            }
+        }
+
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            new VoiceToTextApp();
+        });
+    </script>
+</body>
+</html>
