@@ -144,10 +144,17 @@ def get_audio_duration(file_path):
     except:
         return 25  # Default to short audio
 
-@app.route('/')
+@app.route('/', methods=['GET', 'HEAD'])
 def index():
-    """Serve the main page"""
+    """Serve the main page and gracefully handle HEAD probes"""
+    if request.method == 'HEAD':
+        return '', 200
     return render_template('index.html')
+
+@app.route('/favicon.ico')
+def favicon():
+    """Avoid 500s/404s on favicon requests in hosted environments"""
+    return '', 204
 
 @app.route('/transcribe', methods=['POST'])
 def transcribe():
